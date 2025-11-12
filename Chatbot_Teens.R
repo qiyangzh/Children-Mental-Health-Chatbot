@@ -295,7 +295,9 @@ by_study_outcome <- full %>%
   dplyr::summarise(
     Effect.Size = mean(Effect.Size, na.rm = TRUE),
     var = mean(var, na.rm = TRUE),
-    n_rows = n()  # how many rows were averaged
+    n_rows = n(),  # how many rows were averaged
+    Age   = paste(sort(unique(Age)), collapse = "/"),
+    Response.generation.approach = paste(sort(unique(Response.generation.approach)), collapse = "/")
   )
 fit_HKSJ_SJ <- metafor::rma(
   yi     = Effect.Size,
@@ -308,6 +310,9 @@ summary(fit_HKSJ_SJ)
 pred_HKSJ <- predict(fit_HKSJ_SJ)
 pred_HKSJ
 
+table_result <- table(by_study_outcome$Age, by_study_outcome$Response.generation.approach)
+chisq_test <- chisq.test(table_result)
+print(chisq_test)
 #Positive Outcome Model
 Positive <- subset(full, full$Positive.Outcomes==1)
 
@@ -413,10 +418,10 @@ terms <- c("Age")
 #not significant
 terms <- c("Age.mean")
 terms <- c("Modality")
-terms <- c("Age", "Embodied", "Modality")
-
-#interact <- c("Social.function*Age")
-#formula <- reformulate(termlabels = c(terms, interact))
+terms <- c("Age",  "Response.generation.approach")
+#"Embodied", "Modality",
+interact <- c("Response.generation.approach*Age")
+formula <- reformulate(termlabels = c(terms, interact))
 formula <- reformulate(termlabels = c(terms))
 formula
 
